@@ -14,7 +14,7 @@ project/
 │   └── math_operations.py
 │
 ├── tests/
-│   └── test_math_operations.py
+│   └── test_operation.py
 │
 ├── requirements.txt
 │
@@ -42,7 +42,7 @@ def sub(a, b):
 
 ## Unit Tests
 
-### tests/test_math_operations.py
+### tests/test_operation.py
 
 ```python
 from src.math_operations import add, sub
@@ -294,8 +294,8 @@ git push
 Expected result:
 
 ```text
-❌ Unit Test Failure
-❌ CI Pipeline Failed
+ Unit Test Failure
+ CI Pipeline Failed
 ```
 
 This confirms that automated testing is working correctly.
