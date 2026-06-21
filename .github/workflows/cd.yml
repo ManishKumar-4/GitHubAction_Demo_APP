@@ -2,24 +2,27 @@
 # Continuous Deployment (CD) Workflow
 # =====================================================
 # Purpose:
-# - Trigger only after code is merged into main branch
-# - Re-run tests for safety
-# - Build deployment artifact
-# - Deploy application
+# - Trigger deployment when code is pushed to the main branch
+# - Re-run tests to ensure code quality
+# - Package application files
+# - Upload deployment artifacts
+# - Execute deployment steps
+# - Perform post-deployment validation
 #
-# NOTE:
-# Replace the deployment section with:
-# - AWS deployment
-# - Azure deployment
-# - GCP deployment
-# - Docker deployment
-# - Kubernetes deployment
-# according to your environment.
+# Note:
+# This workflow currently contains a placeholder deployment step.
+# Replace the "Deploy to Production" step with actual deployment
+# commands for AWS, Azure, GCP, Docker, Kubernetes, or a server.
 # =====================================================
 
 name: Python CD Pipeline
 
-# Trigger deployment only after code reaches main
+# =====================================================
+# Workflow Trigger
+# =====================================================
+# Execute the CD pipeline whenever code is pushed to
+# the main branch.
+# =====================================================
 on:
   push:
     branches:
@@ -29,62 +32,154 @@ jobs:
   deploy:
     name: Deploy Application
 
+    # GitHub-hosted Linux runner
     runs-on: ubuntu-latest
 
+    # =================================================
+    # Environment Variables
+    # =================================================
+    # PYTHONPATH allows Python to locate the "src"
+    # package during test execution.
+    # =================================================
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+
+    # =================================================
+    # GitHub Environment
+    # =================================================
+    # Can be configured in:
+    # Repository Settings
+    # → Environments
+    # → production
+    #
+    # Useful for:
+    # - Deployment approvals
+    # - Environment-specific secrets
+    # =================================================
     environment:
       name: production
 
     steps:
-      # Step 1: Checkout repository
+      # ===============================================
+      # Step 1: Checkout Source Code
+      # ===============================================
+      # Downloads repository contents to the runner.
+      # ===============================================
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # ===============================================
       # Step 2: Setup Python
+      # ===============================================
+      # Installs the required Python version.
+      # ===============================================
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # Step 3: Install dependencies
+      # ===============================================
+      # Step 3: Upgrade pip and Install Dependencies
+      # ===============================================
+      # Installs project dependencies from
+      # requirements.txt.
+      # ===============================================
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install -r requirements.txt
 
-      # Step 4: Execute tests before deployment
-      - name: Run Tests
+      # ===============================================
+      # Step 4: Debug Project Structure (Optional)
+      # ===============================================
+      # Useful when troubleshooting import errors.
+      # Can be removed after validation.
+      # ===============================================
+      - name: Debug Project Structure
         run: |
-          pytest tests/ -v
+          echo "Current Directory:"
+          pwd
 
-      # Step 5: Create deployment package
+          echo "Repository Files:"
+          find . -type f
+
+      # ===============================================
+      # Step 5: Execute Unit Tests
+      # ===============================================
+      # Re-runs tests before deployment to ensure
+      # application stability.
+      # ===============================================
+      - name: Run Unit Tests
+        run: |
+          pytest tests -v
+
+      # ===============================================
+      # Step 6: Create Deployment Package
+      # ===============================================
+      # Packages source code for deployment.
+      # Add additional folders if required.
+      # ===============================================
       - name: Package Application
         run: |
           mkdir deployment-package
+
           cp -r src deployment-package/
+
           echo "Application packaged successfully."
 
-      # Step 6: Upload deployment artifact
+      # ===============================================
+      # Step 7: Upload Deployment Artifact
+      # ===============================================
+      # Stores build artifacts for later download
+      # or deployment.
+      # ===============================================
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: deployment-package/
 
-      # Step 7: Deploy Application
-      # Replace this section with your actual deployment commands
+      # ===============================================
+      # Step 8: Deploy Application
+      # ===============================================
+      # Replace this placeholder section with your
+      # actual deployment commands.
+      #
+      # Examples:
+      # - AWS EC2
+      # - AWS Elastic Beanstalk
+      # - Azure App Service
+      # - Google Cloud Run
+      # - Docker Hub
+      # - Kubernetes Cluster
+      # - Linux VM via SSH
+      # ===============================================
       - name: Deploy to Production
         run: |
-          echo "Starting deployment..."
-          echo "Deploying application to production environment..."
+          echo "=================================="
+          echo "Starting deployment process..."
+          echo "Deploying application..."
           echo "Deployment completed successfully."
+          echo "=================================="
 
-      # Step 8: Post-deployment validation
+      # ===============================================
+      # Step 9: Post-Deployment Validation
+      # ===============================================
+      # Add API checks, URL checks, smoke tests,
+      # or health endpoint verification here.
+      # ===============================================
       - name: Health Check
         run: |
-          echo "Performing health checks..."
+          echo "Performing application health checks..."
           echo "Application is healthy."
 
-      # Step 9: Deployment success message
+      # ===============================================
+      # Step 10: Deployment Status
+      # ===============================================
+      # Final confirmation message.
+      # ===============================================
       - name: Deployment Status
         run: |
+          echo "=================================="
           echo "Production deployment successful!"
+          echo "=================================="
