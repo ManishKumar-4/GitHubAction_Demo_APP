@@ -1,0 +1,90 @@
+# =====================================================
+# Continuous Deployment (CD) Workflow
+# =====================================================
+# Purpose:
+# - Trigger only after code is merged into main branch
+# - Re-run tests for safety
+# - Build deployment artifact
+# - Deploy application
+#
+# NOTE:
+# Replace the deployment section with:
+# - AWS deployment
+# - Azure deployment
+# - GCP deployment
+# - Docker deployment
+# - Kubernetes deployment
+# according to your environment.
+# =====================================================
+
+name: Python CD Pipeline
+
+# Trigger deployment only after code reaches main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Application
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      # Step 4: Execute tests before deployment
+      - name: Run Tests
+        run: |
+          pytest tests/ -v
+
+      # Step 5: Create deployment package
+      - name: Package Application
+        run: |
+          mkdir deployment-package
+          cp -r src deployment-package/
+          echo "Application packaged successfully."
+
+      # Step 6: Upload deployment artifact
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-app
+          path: deployment-package/
+
+      # Step 7: Deploy Application
+      # Replace this section with your actual deployment commands
+      - name: Deploy to Production
+        run: |
+          echo "Starting deployment..."
+          echo "Deploying application to production environment..."
+          echo "Deployment completed successfully."
+
+      # Step 8: Post-deployment validation
+      - name: Health Check
+        run: |
+          echo "Performing health checks..."
+          echo "Application is healthy."
+
+      # Step 9: Deployment success message
+      - name: Deployment Status
+        run: |
+          echo "Production deployment successful!"
